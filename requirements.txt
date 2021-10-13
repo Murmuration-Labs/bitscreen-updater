@@ -1,0 +1,6 @@
+requests==2.26.0
+web3==5.23.1
+tabulate==0.8.9
+dashing==0.1.0
+py-crypto-hd-wallet==0.13.0
+zmq
