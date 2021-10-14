@@ -15,22 +15,37 @@ seed_phrase   | BITSCREEN_PROVIDER_SEED_PHRASE |
 `To load the provider wallet to communicate with the backend either
 BITSCREEN_PROVIDER_KEY or BITSCREEN_PROVIDER_SEED_PHRASE must be set.`
 
-## Run
+## pip install
+```bash
+pip install bitscreen-updater
+```
+
+## Development install
+```bash
+sudo python setup.py install
+```
+
+## Run from source
 ```bash
 # clone this repo
 cd bitscreen-updater
 export BITSCREEN_PROVIDER_SEED_PHRASE="provider wallet seed phrase"
 
 # Start the daemon
-python ./bitscreen_updater/main.py start
+python -m bitscreen_updater start
 
 # Stop the daemon
-python ./bitscreen_updater/main.py stop
+python -m bitscreen_updater stop
 
 # Restart the daemon
-python ./bitscreen_updater/main.py restart
+python -m bitscreen_updater restart
 
 # Get the status of the daemon
-python ./bitscreen_updater/main.py status
+python -m bitscreen_updater status
 
+```
+
+## Run installed
+```bash
+bitscreen-updater [start|stop|restart|status]
 ```
