@@ -11,14 +11,14 @@ from bitscreen_updater.updater import FilterUpdater
 '''
 Config:
 * Provider wallet (private key or seed phrase)
-* 
+*
 Flow:
 * log in using provider wallet, obtain session token
 1. Start list/API-updater
   * get list from API
   * save list to file
   * add list to queue if different than old
-  * Check CIDs-blocked Counter and send update to API  
+  * Check CIDs-blocked Counter and send update to API
 2. Start the filter-listener to respond to any filter requests
   * Keep pointer to latest CIDs list
   * Listen to requests on open pipe
@@ -72,10 +72,14 @@ def main():
                     'cid': cid
                 })
 
-            socket.send(msg)
+            socket.send_string(msg)
             if cid is not None:
                 updater.update_cid_blocked(cid, deal_type, int(not blocked))
         except Exception:
+            socket.send_string(json.dumps({
+                'error': "Invalid message",
+                'reject': 0
+            }))
             pass
 
         time.sleep(0.01)
