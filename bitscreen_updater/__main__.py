@@ -7,8 +7,8 @@ import sys
 
 import zmq
 
-from bitscreen_updater.updater import FilterUpdater
-from daemon import Daemon
+from .updater import FilterUpdater
+from .daemon import Daemon
 
 '''
 Config:
@@ -86,8 +86,7 @@ class UpdaterDaemon(Daemon):
 
             time.sleep(0.01)
 
-
-if __name__ == "__main__":
+def main():
     daemon = UpdaterDaemon('/tmp/daemon-updater.pid')
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
@@ -105,3 +104,6 @@ if __name__ == "__main__":
     else:
         print("usage: %s start|stop|restart|status" % sys.argv[0])
         sys.exit(2)
+
+if __name__ == "__main__":
+    main()
