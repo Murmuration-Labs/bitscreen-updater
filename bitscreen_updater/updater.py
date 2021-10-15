@@ -1,12 +1,13 @@
 import os
 
 import sys
+import json
 
 from bitscreen_updater.provider_session import ProviderSession
 from bitscreen_updater.task_runner import TaskRunner
 
 SECONDS_BETWEEN_UPDATES = 5
-
+DEFAULT_CIDS_FILE = '~/.murmuration/bitscreen'
 
 class FilterUpdater:
     def __init__(self, api_host, provider_id, private_key=None, seed_phrase=None):
@@ -52,11 +53,16 @@ class FilterUpdater:
             cids_to_block = self.fetch_provider_cids()
             if cids_to_block != self.get_cids_to_block():
                 self.set_cids_to_block(cids_to_block)
+                self.write_to_file(cids_to_block)
                 print('got a new set of CIDs (total of %s).' % len(cids_to_block))
 
         except Exception as err:
             print('Error fetching cids to block: %s' % err)
 
+    def write_to_file(self, cids):
+        filePath = os.getenv('BITSCREEN_CIDS_FILE', DEFAULT_CIDS_FILE)
+        with open(os.path.expanduser(filePath), 'w') as cids_file:
+            cids_file.write(json.dumps(cids))
 
 if __name__ == "__main__":
     updater = FilterUpdater(sys.argv[1], sys.argv[2], sys.argv[3])
