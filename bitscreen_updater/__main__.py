@@ -83,7 +83,6 @@ class UpdaterDaemon(Daemon):
                 if cid is not None:
                     updater.update_cid_blocked(cid, deal_type, int(not blocked))
             except Exception as ex:
-                raise ex
                 socket.send_string(json.dumps({
                     'error': "Invalid message",
                     'reject': 0
