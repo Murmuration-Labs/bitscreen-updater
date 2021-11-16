@@ -6,6 +6,7 @@ import time
 import sys
 
 import zmq
+from Crypto.Hash import keccak
 
 from .updater import FilterUpdater
 from .daemon import Daemon
@@ -66,7 +67,11 @@ class UpdaterDaemon(Daemon):
                     })
                 else:
                     #  Send reply back with dealCid, cid, and result
-                    blocked = cid in updater.get_cids_to_block()
+                    k = keccak.new(digest_bits=256)
+                    k.update(cid.encode())
+                    hashedCid = k.hexdigest()
+
+                    blocked = hashedCid in updater.get_cids_to_block()
                     deal_type = deal_request.get('dealType', 1)
                     msg = json.dumps({
                         'reject': int(blocked),
@@ -77,7 +82,8 @@ class UpdaterDaemon(Daemon):
                 socket.send_string(msg)
                 if cid is not None:
                     updater.update_cid_blocked(cid, deal_type, int(not blocked))
-            except Exception:
+            except Exception as ex:
+                raise ex
                 socket.send_string(json.dumps({
                     'error': "Invalid message",
                     'reject': 0
