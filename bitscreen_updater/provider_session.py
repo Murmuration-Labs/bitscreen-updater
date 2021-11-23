@@ -46,7 +46,7 @@ class ProviderSession:
         response = requests.get(self.host + '/provider/' + self.wallet.address.lower())
         if response.status_code == 200:
             try:
-                return response.json()['nonce']
+                return response.json()['nonceMessage']
             except:
                 pass
 
