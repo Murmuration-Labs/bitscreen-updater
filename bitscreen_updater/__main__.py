@@ -70,6 +70,7 @@ class UpdaterDaemon(Daemon):
                     k = keccak.new(digest_bits=256)
                     k.update(cid.encode())
                     hashedCid = k.hexdigest()
+                    print(f"Hashed CID: ${hashedCid}")
 
                     blocked = hashedCid in updater.get_cids_to_block()
                     deal_type = deal_request.get('dealType', 1)
@@ -78,15 +79,17 @@ class UpdaterDaemon(Daemon):
                         'dealCid': deal_request.get('dealCid', ''),
                         'cid': cid
                     })
-
+                print(f"Response: ${msg}")
                 socket.send_string(msg)
                 if cid is not None:
                     updater.update_cid_blocked(cid, deal_type, int(not blocked))
             except Exception as ex:
-                socket.send_string(json.dumps({
+                response = json.dumps({
                     'error': "Invalid message",
                     'reject': 0
-                }))
+                })
+                print(f"Response: ${response}")
+                socket.send_string(response)
                 pass
 
             time.sleep(0.01)
