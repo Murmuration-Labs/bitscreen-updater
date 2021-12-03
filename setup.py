@@ -20,7 +20,7 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs \
 setup (
  name = 'bitscreen-updater',
  description = 'A BitScreen daemon that keeps track of all blocked CIDs and checks deal requests through a socket',
- version = '0.1.7',
+ version = '0.1.8',
  packages = find_packages(),
  install_requires = install_requires,
  python_requires='>=3.0',
