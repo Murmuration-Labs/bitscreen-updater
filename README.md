@@ -31,6 +31,9 @@ sudo python setup.py install
 cd bitscreen-updater
 export BITSCREEN_PROVIDER_SEED_PHRASE="provider wallet seed phrase"
 
+# Run the Updater
+python -m bitscreen_updater run
+
 # Start the daemon
 python -m bitscreen_updater start
 
@@ -47,5 +50,5 @@ python -m bitscreen_updater status
 
 ## Run installed
 ```bash
-bitscreen-updater [start|stop|restart|status]
+bitscreen-updater [run|start|stop|restart|status]
 ```

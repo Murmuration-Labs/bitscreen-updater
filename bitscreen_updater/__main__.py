@@ -84,6 +84,7 @@ class UpdaterDaemon(Daemon):
                 if cid is not None:
                     updater.update_cid_blocked(cid, deal_type, int(not blocked))
             except Exception as ex:
+                print(ex)
                 response = json.dumps({
                     'error': "Invalid message",
                     'reject': 0
@@ -99,6 +100,8 @@ def main():
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             daemon.start()
+        elif 'run' == sys.argv[1]:
+            daemon.run()
         elif 'stop' == sys.argv[1]:
             daemon.stop()
         elif 'restart' == sys.argv[1]:
@@ -110,7 +113,7 @@ def main():
                 sys.exit(2)
         sys.exit(0)
     else:
-        print("usage: %s start|stop|restart|status" % sys.argv[0])
+        print("usage: %s run|start|stop|restart|status" % sys.argv[0])
         sys.exit(2)
 
 if __name__ == "__main__":
