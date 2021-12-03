@@ -22,7 +22,7 @@ class BearerAuth(requests.auth.AuthBase):
 class ProviderSession:
     def __init__(self, host, private_key=None, seed_phrase=None):
         assert private_key or seed_phrase, 'one of `private_key` or `seed_phrase` must be provided.'
-        self.host = host
+        self.host = host.rstrip('/')
         self.access_token = None
         self.provider = {} # id, accessToken, businessName,
         self.wallet = self._get_wallet(seed_phrase, private_key)
