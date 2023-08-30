@@ -43,7 +43,8 @@ class ProviderSession:
         return Wallet(address, private_key)
 
     def _get_nonce(self):
-        response = requests.get(self.host + '/provider/' + self.wallet.address.lower())
+        response = requests.get(self.host + '/provider/auth_info/' + self.wallet.address.lower())
+
         if response.status_code == 200:
             try:
                 return response.json()['nonceMessage']
@@ -62,7 +63,7 @@ class ProviderSession:
 
     def authenticate(self, signature):
         response = requests.post(
-            self.host + '/provider/auth/' + self.wallet.address.lower(),
+            self.host + '/provider/auth/wallet/' + self.wallet.address.lower(),
             json={'signature': signature}
         )
         if response.status_code in {200, 201}:
@@ -94,7 +95,12 @@ class ProviderSession:
             raise
 
         assert self.access_token, 'authenticate did not raise an exception but `accessToken` is not set.'
-        print(f"Authenticated as " + self.provider.get('businessName', self.wallet.address.lower()))
+        businessName = self.provider.get('businessName', self.wallet.address.lower())
+
+        if businessName is None:
+            print (f'Authenticated. Business name not set')
+        else:
+            print(f"Authenticated as " + self.provider.get('businessName', self.wallet.address.lower()))
 
     def get_cids_to_block(self):
         if not self.access_token:

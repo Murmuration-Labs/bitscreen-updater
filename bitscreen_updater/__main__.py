@@ -37,7 +37,7 @@ Flow:
 class UpdaterDaemon(Daemon):
     def run(self):
         socket_port = os.getenv('BITSCREEN_SOCKET_PORT', '5555')
-        host = os.getenv('BITSCREEN_BACKEND_HOST', 'https://bxn.mml.keyko.rocks')
+        host = os.getenv('BITSCREEN_BACKEND_HOST', 'https://backend.bitscreen.co')
         key = os.getenv('BITSCREEN_PROVIDER_KEY', None)
         seed_phrase = os.getenv('BITSCREEN_PROVIDER_SEED_PHRASE', None)
         updater = FilterUpdater(host, None, key, seed_phrase)
@@ -72,8 +72,8 @@ class UpdaterDaemon(Daemon):
                     hashedCid = k.hexdigest()
                     print(f"Hashed CID: ${hashedCid}")
 
-                    blocked = cid in updater.get_cids_to_block()
-                    blockedHashed = hashedCid in updater.get_cids_to_block()
+                    blocked = cid in updater.get_filecoin_cids_to_block()
+                    blockedHashed = hashedCid in updater.get_filecoin_cids_to_block()
                     deal_type = deal_request.get('dealType', 1)
                     msg = json.dumps({
                         'reject': int(blockedHashed or blocked),

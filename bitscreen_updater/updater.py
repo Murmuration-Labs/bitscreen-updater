@@ -2,18 +2,21 @@ import os
 
 import sys
 import json
+import traceback
 
 from bitscreen_updater.provider_session import ProviderSession
 from bitscreen_updater.task_runner import TaskRunner
 
 SECONDS_BETWEEN_UPDATES = 5
-DEFAULT_CIDS_FILE = '~/.murmuration/bitscreen'
+DEFAULT_FILECOIN_FILE = '~/.murmuration/bitscreen'
+DEFAULT_IPFS_FILE = "~/.config/ipfs/denylists/bitscreen.deny"
 
 class FilterUpdater:
     def __init__(self, api_host, provider_id, private_key=None, seed_phrase=None):
         self._api_host = api_host
         self._provider_id = provider_id
-        self._cids_to_block = set()
+        self._filecoin_cids_to_block = set()
+        self._ipfs_cids_to_block = set()
         self._seconds_between_updates = FilterUpdater.get_seconds_between_updates()
         self.provider = ProviderSession(api_host, private_key, seed_phrase)
         self.task_runner = None
@@ -26,11 +29,17 @@ class FilterUpdater:
         except (TypeError, ValueError):
             return SECONDS_BETWEEN_UPDATES
 
-    def get_cids_to_block(self):
-        return self._cids_to_block
+    def get_filecoin_cids_to_block(self):
+        return self._filecoin_cids_to_block
 
-    def set_cids_to_block(self, cids):
-        self._cids_to_block = cids
+    def get_ipfs_cids_to_block(self):
+        return self._ipfs_cids_to_block
+
+    def set_filecoin_cids_to_block(self, cids):
+        self._filecoin_cids_to_block = cids
+
+    def set_ipfs_cids_to_block(self, cids):
+        self._ipfs_cids_to_block = cids
 
     def start_updater(self):
         if self.task_runner:
@@ -51,18 +60,34 @@ class FilterUpdater:
     def do_one_update(self):
         try:
             cids_to_block = self.fetch_provider_cids()
-            if cids_to_block != self.get_cids_to_block():
-                self.set_cids_to_block(cids_to_block)
-                self.write_to_file(cids_to_block)
-                print('got a new set of CIDs (total of %s).' % len(cids_to_block))
+            filecoin_cids = cids_to_block.get("filecoinCids")
+            ipfs_cids = cids_to_block.get("ipfsCids")
+
+            if filecoin_cids != self.get_filecoin_cids_to_block():
+                self.set_filecoin_cids_to_block(filecoin_cids)
+                self.write_to_file(filecoin_cids, 'filecoin')
+                print('got a new set of CIDs for Filecoin (total of %s).' % len(filecoin_cids))
+
+            if ipfs_cids != self.get_ipfs_cids_to_block():
+                self.set_ipfs_cids_to_block(ipfs_cids)
+                self.write_to_file(ipfs_cids, 'ipfs')
+                print('got a new set of CIDs for IPFS (total of %s).' % len(ipfs_cids))
 
         except Exception as err:
             print('Error fetching cids to block: %s' % err)
+            traceback.print_exc()
 
-    def write_to_file(self, cids):
-        filePath = os.getenv('BITSCREEN_CIDS_FILE', DEFAULT_CIDS_FILE)
-        with open(os.path.expanduser(filePath), 'w') as cids_file:
-            cids_file.write(json.dumps(cids))
+    def write_to_file(self, cids, network):
+        filecoinFilePath = os.getenv('FILECOIN_CIDS_FILE', DEFAULT_FILECOIN_FILE)
+        ipfsFilePath = os.getenv('IPFS_CIDS_FILE', DEFAULT_IPFS_FILE)
+
+        if (network == 'filecoin'):
+            with open(os.path.expanduser(filecoinFilePath), 'w') as filecoin_cids_file:
+                filecoin_cids_file.write(json.dumps(cids))
+
+        if (network == 'ipfs'):
+            with open(os.path.expanduser(ipfsFilePath), "wt", encoding="utf-8") as ipfs_cids_file:
+                ipfs_cids_file.write('\n'.join(list(map(lambda x: '//' + x, cids))) + '\n')
 
 if __name__ == "__main__":
     updater = FilterUpdater(sys.argv[1], sys.argv[2], sys.argv[3])
