@@ -6,7 +6,7 @@ import time
 import sys
 
 import zmq
-from Crypto.Hash import keccak
+from Crypto.Hash import SHA256
 
 from .updater import FilterUpdater
 from .daemon import Daemon
@@ -67,9 +67,9 @@ class UpdaterDaemon(Daemon):
                     })
                 else:
                     #  Send reply back with dealCid, cid, and result
-                    k = keccak.new(digest_bits=256)
-                    k.update(cid.encode())
-                    hashedCid = k.hexdigest()
+                    h = SHA256.new()
+                    h.update(cid.encode())
+                    hashedCid = h.hexdigest()
                     print(f"Hashed CID: ${hashedCid}")
 
                     blocked = cid in updater.get_filecoin_cids_to_block()

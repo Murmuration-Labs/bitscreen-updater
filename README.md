@@ -6,17 +6,21 @@ Python process to keep the list of filters up to date
 
 Environment variables
 
-| description        | env var                        | default                                |
-| ------------------ | ------------------------------ | -------------------------------------- |
-| socket_port        | BITSCREEN_SOCKET_PORT          | 5555                                   |
-| host               | BITSCREEN_BACKEND_HOST         | http://localhost:3030                  |
-| filecoin cids file | FILECOIN_CIDS_FILE             | ~/.murmuration/bitscreen               |
-| ipfs cids file     | IPFS_CIDS_FILE                 | ~/.config/ipfs/denylist/bitscreen.deny |
-| key                | BITSCREEN_PROVIDER_KEY         |
-| seed_phrase        | BITSCREEN_PROVIDER_SEED_PHRASE |
+| description                  | env var                        | default                                |
+| ---------------------------- | ------------------------------ | -------------------------------------- |
+| socket_port                  | BITSCREEN_SOCKET_PORT          | 5555                                   |
+| host                         | BITSCREEN_BACKEND_HOST         | http://localhost:3030                  |
+| filecoin (lotus) cids file   | FILECOIN_CIDS_FILE             | ~/.murmuration/bitscreen               |
+| ipfs (kubo) cids file        | IPFS_CIDS_FILE                 | ~/.config/ipfs/denylist/bitscreen.deny |
+| Should lotus block from file | LOTUS_BLOCK_FROM_FILE          | 0                                      |
+| key                          | BITSCREEN_PROVIDER_KEY         |
+| seed_phrase                  | BITSCREEN_PROVIDER_SEED_PHRASE |
 
 `To load the provider wallet to communicate with the backend either
 BITSCREEN_PROVIDER_KEY or BITSCREEN_PROVIDER_SEED_PHRASE must be set.`
+
+`For Lotus: To use the specified file to block unwanted deals you must set the environment variable
+LOTUS_BLOCK_FROM_FILE to 1.`
 
 ## pip install
 
