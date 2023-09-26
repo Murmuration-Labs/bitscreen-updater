@@ -70,7 +70,8 @@ class FilterUpdater:
 
             if ipfs_cids != self.get_ipfs_cids_to_block():
                 self.set_ipfs_cids_to_block(ipfs_cids)
-                self.write_to_file(ipfs_cids, 'ipfs')
+                ipfs_add_list = self.generate_cids_add_list(['//' + s for s in ipfs_cids])
+                self.write_to_file(ipfs_add_list, 'ipfs')
                 print('got a new set of CIDs for IPFS (total of %s).' % len(ipfs_cids))
 
         except Exception as err:
@@ -86,8 +87,45 @@ class FilterUpdater:
                 filecoin_cids_file.write(json.dumps(cids))
 
         if (network == 'ipfs'):
-            with open(os.path.expanduser(ipfsFilePath), "wt", encoding="utf-8") as ipfs_cids_file:
-                ipfs_cids_file.write('\n'.join(list(map(lambda x: '//' + x, cids))) + '\n')
+            with open(os.path.expanduser(ipfsFilePath), "at", encoding="utf-8") as ipfs_cids_file:
+                ipfs_cids_file.write('\n'.join(cids) + '\n')
+
+    @staticmethod
+    def process_file_cids(input_list):
+        processed_dict = {}
+        for string in input_list:
+            key = string.lstrip('!')  # Remove any leading exclamation marks for the key
+            processed_dict[key] = string[0] != '!'  # True if no exclamation mark, False if there is
+        return processed_dict
+
+    def generate_cids_add_list(self, db_cids):
+        ipfsFilePath = os.getenv('IPFS_CIDS_FILE', DEFAULT_IPFS_FILE)
+        with open(os.path.expanduser(ipfsFilePath), 'a+', encoding='utf-8') as file:
+            file.seek(0)  # Set the file pointer to the beginning of the file
+            if file.readable() and not file.read(1):  # Check if file is readable and empty
+                file_cids = []
+            else:
+                file.seek(0)  # Reset the file pointer to the beginning of the file
+                file_cids = [line.strip() for line in file if line.strip()]
+
+        processed_file_cids = self.process_file_cids(file_cids)
+
+        cids_to_add = []
+
+        # Step 1: Process dbCids
+        for cid in db_cids:
+            if processed_file_cids.get(cid, False) is False:
+                cids_to_add.append(cid)
+            if cid in processed_file_cids:  # if cid is a key and its associated value is True
+                del processed_file_cids[cid]  # Remove the key from the dictionary
+
+        # Step 2: Process remaining keys in processed_file_cids
+        for cid, value in processed_file_cids.items():
+            if value is True:
+                cids_to_add.append('!' + cid)  # Add with an exclamation mark at the beginning
+
+        return cids_to_add
+        
 
 if __name__ == "__main__":
     updater = FilterUpdater(sys.argv[1], sys.argv[2], sys.argv[3])
