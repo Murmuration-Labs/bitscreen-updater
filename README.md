@@ -63,3 +63,15 @@ python -m bitscreen_updater status
 ```bash
 bitscreen-updater [run|start|stop|restart|status]
 ```
+
+## IPFS CONTENT FILTERING GUIDE
+
+This guide applies to anyone who wants to filter the content that can be retrieved from their IPFS nodes. For the initial setup (unrelated to BitScreen) the IPFS node must be initialized through KUBO (`https://docs.ipfs.tech/how-to/command-line-quick-start/`) and the Nopfs plugin must be added (`https://github.com/ipfs-shipyard/nopfs`).
+
+Afterwards, the BitScreen Updater has to be installed: `https://github.com/Murmuration-Labs/bitscreen-updater`
+
+The BitScreen Updater connects to an existing account on BitScreen. One can be created in the BitScreen GUI here: `https://app.bitscreen.co` . The account must be created with a wallet or have a wallet address associated to it. To load the provider wallet to communicate with the backend either `BITSCREEN_PROVIDER_KEY` or `BITSCREEN_PROVIDER_SEED_PHRASE` must be set.
+
+We then run the BitScreen Updater with the command: `bitscreen-updater run` . The Updater will create the `bitscreen.denylist` file used by the Nopfs plugin and will keep it updated by constantly communicating with the server. Restart the IPFS node if it was already running when the BitScreen Updater was first started, as the plugin will not identify the creation of new .denylist files.
+
+In order to block different content ids (CIDs) from being retrieved you must add them in a filter list in BitScreen either through the BitScreen CLI or through the BitScreen GUI. These CIDs will be added to the denylist in a hashed version. As previously mentioned the file is always kept up-to-date for both adding new CIDs or allowing some that were previously blocked.
