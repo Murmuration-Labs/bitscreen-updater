@@ -20,7 +20,7 @@ Environment variables
 BITSCREEN_PROVIDER_KEY or BITSCREEN_PROVIDER_SEED_PHRASE must be set.`
 
 `For Lotus: To use the specified file to block unwanted deals you must set the environment variable
-LOTUS_BLOCK_FROM_FILE to 1.`
+LOTUS_BLOCK_FROM_FILE to 1.` The default value (0) queries the server directly instead of using the file content.
 
 ## pip install
 
